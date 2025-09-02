@@ -1,6 +1,7 @@
 import type { CopiedFile } from 'bridge/BridgeAPI';
 import type { AsyncModAPI } from 'bridge/ModAPI';
 import { InstallationRuntime } from './InstallationRuntime';
+import path from 'path';
 
 let nextStringIDRaw: string | null = null;
 let nextStringID: number = 0;
@@ -80,6 +81,9 @@ export function getModAPI(runtime: InstallationRuntime): AsyncModAPI {
       throw new Error(message);
     },
     readTsv: async (filePath) => {
+      if (process.platform !== 'win32') {
+        filePath = filePath.replace(/\\/g, '/');
+      }
       console.debug('D2RMM.readTsv', filePath);
       await tryExtractFile(filePath);
       const result = await runtime.BridgeAPI.readTsv(
@@ -89,6 +93,9 @@ export function getModAPI(runtime: InstallationRuntime): AsyncModAPI {
       return result;
     },
     writeTsv: async (filePath, data) => {
+      if (process.platform !== 'win32') {
+        filePath = filePath.replace(/\\/g, '/');
+      }
       console.debug('D2RMM.writeTsv', filePath);
       if (!runtime.options.isDryRun) {
         await runtime.BridgeAPI.writeTsv(
@@ -99,6 +106,9 @@ export function getModAPI(runtime: InstallationRuntime): AsyncModAPI {
       }
     },
     readJson: async (filePath) => {
+      if (process.platform !== 'win32') {
+        filePath = filePath.replace(/\\/g, '/');
+      }
       console.debug('D2RMM.readJson', filePath);
       await tryExtractFile(filePath);
       const result = await runtime.BridgeAPI.readJson(
@@ -108,6 +118,9 @@ export function getModAPI(runtime: InstallationRuntime): AsyncModAPI {
       return result;
     },
     writeJson: async (filePath, data) => {
+      if (process.platform !== 'win32') {
+        filePath = filePath.replace(/\\/g, '/');
+      }
       console.debug('D2RMM.writeJson', filePath);
       if (!runtime.options.isDryRun) {
         await runtime.BridgeAPI.writeJson(
@@ -118,6 +131,10 @@ export function getModAPI(runtime: InstallationRuntime): AsyncModAPI {
       }
     },
     copyFile: async (src, dst, overwrite = false) => {
+      if (process.platform !== 'win32') {
+        src = src.replace(/\\/g, '/');
+        dst = dst.replace(/\\/g, '/');
+      }
       console.debug('D2RMM.copyFile', src, dst);
       if (!runtime.options.isDryRun) {
         const copiedFiles: CopiedFile[] = [];
@@ -136,6 +153,9 @@ export function getModAPI(runtime: InstallationRuntime): AsyncModAPI {
       }
     },
     readTxt: async (filePath) => {
+      if (process.platform !== 'win32') {
+        filePath = filePath.replace(/\\/g, '/');
+      }
       console.debug('D2RMM.readTxt', filePath);
       await tryExtractFile(filePath);
       const result = await runtime.BridgeAPI.readTxt(
@@ -145,6 +165,9 @@ export function getModAPI(runtime: InstallationRuntime): AsyncModAPI {
       return result;
     },
     writeTxt: async (filePath, data) => {
+      if (process.platform !== 'win32') {
+        filePath = filePath.replace(/\\/g, '/');
+      }
       console.debug('D2RMM.writeTxt', filePath);
       if (!runtime.options.isDryRun) {
         await runtime.BridgeAPI.writeTxt(
@@ -155,12 +178,18 @@ export function getModAPI(runtime: InstallationRuntime): AsyncModAPI {
       }
     },
     readSaveFile: async (filePath) => {
+      if (process.platform !== 'win32') {
+        filePath = filePath.replace(/\\/g, '/');
+      }
       console.debug('D2RMM.readSaveFile', filePath);
       const result = await runtime.BridgeAPI.readBinaryFile(filePath, 'Saves');
       await runtime.fileManager.read(filePath, runtime.mod.id);
       return result;
     },
     writeSaveFile: async (filePath, data) => {
+      if (process.platform !== 'win32') {
+        filePath = filePath.replace(/\\/g, '/');
+      }
       console.debug('D2RMM.writeSaveFile', filePath);
       if (!runtime.options.isDryRun) {
         await runtime.BridgeAPI.writeBinaryFile(filePath, 'Saves', data);
@@ -170,7 +199,7 @@ export function getModAPI(runtime: InstallationRuntime): AsyncModAPI {
     getNextStringID: async () => {
       console.debug('D2RMM.getNextStringID');
 
-      const filePath = 'local\\lng\\next_string_id.txt';
+      const filePath = path.join('local', 'lng', 'next_string_id.txt');
 
       if (nextStringIDRaw == null) {
         await tryExtractFile(filePath);
